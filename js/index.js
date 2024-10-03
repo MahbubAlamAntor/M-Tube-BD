@@ -6,12 +6,52 @@ function timeString(times){
     remainingSecond = remainingMin % 60;
     return `${hour} Hour ${minutes} minutes ${remainingSecond} Ago`
 }
+
+
 const categoriesCl = (id) => {
     fetch(`https://openapi.programming-hero.com/api/phero-tube/category/${id}`)
     .then(res => res.json())
-    .then(data => displayVideo(data.category))
+    .then(data => {
+
+        removeActiveBtn();
+
+        const activeBtn = document.getElementById(`btn-${id}`);
+        activeBtn.classList.add('active')
+        displayVideo(data.category);
+    })
     .catch(error => console.error(error))
 }
+
+const removeActiveBtn = () =>{
+    const buttons = document.getElementsByClassName('category-btn');
+    console.log(buttons)
+    for(let btn of buttons){
+        btn.classList.remove('active')
+    }
+}
+
+const descriptionBtn = async (video) =>{
+    const uri = `https://openapi.programming-hero.com/api/phero-tube/video/${video}`
+    const res = await fetch(uri)
+    const data = await res.json();
+    displayDescription(data.video);
+}
+
+const displayDescription = (data) => {
+    console.log(data)
+    const modalContent = document.getElementById('modal-content')
+    modalContent.innerHTML = `
+        <img src=${data.thumbnail} />
+        <p>${data.description}</p>
+    `
+
+    // show modal 
+    document.getElementById('customModal').showModal();
+}
+
+
+
+
 
 
 // for display button
@@ -23,12 +63,15 @@ const loadCategories = () => {
 }
 
 const displayCategories = (data) => {
+
+    
+    
     const categoriesContainer = document.getElementById('categories')
 
     data.forEach((result) => {
         const buttonContainer = document.createElement('div');
         buttonContainer.innerHTML = `
-            <button onclick="categoriesCl(${result.category_id})" class="btn">${result.category}</button>
+            <button id="btn-${result.category_id}" onclick="categoriesCl(${result.category_id})" class="btn category-btn">${result.category}</button>
         `
         categoriesContainer.append(buttonContainer)
     })
@@ -89,8 +132,12 @@ const displayVideo = (data) => {
                 <p class="text-gray-400 flex gap-2 items-center">${data2.authors[0].profile_name} ${data2.authors[0].verified === true ? `<img class="w-4" src="https://img.icons8.com/?size=100&id=D9RtvkuOe31p&format=png&color=000000"/>` : ""}</p>
                 
             </div>
-        </div>
+        </div> 
     </div>
+        <div>
+            <button onclick="descriptionBtn('${data2.video_id
+            }')" class="btn btn-error">Description</button>
+        </div>
   </div>
         `
         videosContainer.append(div);
