@@ -79,12 +79,12 @@ const displayCategories = (data) => {
 
 // for display videos
 
-const showVideo = async () => {
+const showVideo = async (searchText = "") => {
     // const res = await fetch('https://openapi.programming-hero.com/api/phero-tube/videos')
     // const data = await res.json()
     // displayVideo(data.videos);
 
-    fetch('https://openapi.programming-hero.com/api/phero-tube/videos')
+    fetch(`https://openapi.programming-hero.com/api/phero-tube/videos?title=${searchText}`)
         .then(res => res.json())
         .then(data => displayVideo(data.videos))
         .catch(error => console.error(error))
@@ -143,6 +143,11 @@ const displayVideo = (data) => {
         videosContainer.append(div);
     })
 }
+
+document.getElementById('search-input').addEventListener('keyup', (e)=> {
+    showVideo(e.target.value)
+})
+
 
 loadCategories();
 showVideo();
